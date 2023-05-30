@@ -289,6 +289,7 @@ class Sample : AppCompatActivity() {
                 saveSms(message!!, phoneNumber!!, id!!)
                 removeItem()
             }
+            
             if (messageList?.size!! > 0) {
                 handler.postDelayed({
                     sendTypeSms(
