@@ -55,6 +55,8 @@ class HomeFragment : Fragment() {
     private var smsLimit = 0
     private var mediaPlayer: MediaPlayer? = null
 
+
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,23 +79,6 @@ class HomeFragment : Fragment() {
         homeList!!.dividerHeight = 20
         sharedPreferences = activity?.getSharedPreferences("teda.uz", 0)
 
-        if (!isSmsPermissionGranted()) {
-            val alertDialog = AlertDialog.Builder(requireActivity())
-            alertDialog.setTitle("SMS")
-            alertDialog.setMessage("SMS xizmatiga ruxsat berildi")
-            alertDialog.setPositiveButton("OK") { dialog, _ ->
-                requestSendSmsPermission()
-                dialog.dismiss()
-            }
-            alertDialog.setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            alertDialog.show()
-        } else {
-            smsManager = SmsManager.getDefault()
-            getData()
-        }
-
         swipeRefreshHome?.setOnRefreshListener {
             if (!isSmsPermissionGranted()) {
                 val alertDialog = AlertDialog.Builder(requireActivity())
@@ -108,7 +93,7 @@ class HomeFragment : Fragment() {
                 }
                 alertDialog.show()
             } else {
-                getData()
+                //getData()
             }
         }
         homeList?.setOnScrollListener(object : AbsListView.OnScrollListener {
@@ -131,7 +116,6 @@ class HomeFragment : Fragment() {
                 }
             }
         })
-
         btnHomNewSms!!.setOnClickListener {
             if (!isSmsPermissionGranted()) {
                 val alertDialog = AlertDialog.Builder(requireActivity())
@@ -146,10 +130,15 @@ class HomeFragment : Fragment() {
                 }
                 alertDialog.show()
             } else {
-                getNewData()
+                Toast.makeText(
+                    requireContext(),
+                    "Smslar yuklanmoqda",
+                    Toast.LENGTH_SHORT
+                ).show()
+                txtHomipAdress!!.text = Sample.getIpAddress()
+                txtHomipLimt!!.text = Sample.getSmsLimit() + " ta Sms"
             }
         }
-
         btnHomSendSms!!.setOnClickListener {
             sendSms(
                 id_list,
@@ -161,11 +150,14 @@ class HomeFragment : Fragment() {
             )
         }
 
+        Sample.addSMSCountListener { count ->
+            txtHomipLimt!!.text = "$count ta Sms"
+        }
+        txtHomipAdress!!.text = Sample.getIpAddress()
+        txtHomipLimt!!.text = Sample.getSmsLimit() + " ta Sms"
+
         return view
     }
-
-
-
     @SuppressLint("SetTextI18n")
     private fun getData() {
         var ipAddress = ""
