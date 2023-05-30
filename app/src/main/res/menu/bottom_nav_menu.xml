@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/sms_icon"
+        android:title="@string/sms" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/bottom1_icon"
+        android:title="@string/yuborilganlar" />
+
+    <!--<item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/send_icon"
+        android:title="@string/arxiv" />-->
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/settings_icon"
+        android:title="@string/sozlash" />
+
+</menu>
