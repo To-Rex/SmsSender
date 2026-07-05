@@ -7,4 +7,14 @@
         <item name="colorAccent">@color/teal_200</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="BottomNavTextActive" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="BottomNavTextInactive" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">10sp</item>
+    </style>
 </resources>

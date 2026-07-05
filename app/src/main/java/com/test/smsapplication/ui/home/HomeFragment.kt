@@ -45,6 +45,8 @@ class HomeFragment : Fragment() {
     private var txtHomipLimt: TextView? = null
     private var btnHomNewSms: Button? = null
     private var btnHomSendSms: Button? = null
+    private var btnHomStop: Button? = null
+    private var shouldStopSending = false
     private var adapter: DashAdapter? = null
     private var id_list: MutableList<Int>? = null
     private var phone_list: MutableList<String>? = null
@@ -73,14 +75,17 @@ class HomeFragment : Fragment() {
         txtHomipLimt = view.findViewById(R.id.txtHomipLimt)
         btnHomNewSms = view.findViewById(R.id.btnHomNewSms)
         btnHomSendSms = view.findViewById(R.id.btnHomSendSms)
+        btnHomStop = view.findViewById(R.id.btnHomStop)
         swipeRefreshHome = view.findViewById(R.id.swipeRefreshHome)
 
         homeList!!.divider = null
         homeList!!.dividerHeight = 20
         sharedPreferences = activity?.getSharedPreferences("teda.uz", 0)
+        smsManager = SmsManager.getDefault()
 
         swipeRefreshHome?.setOnRefreshListener {
             if (!isSmsPermissionGranted()) {
+                swipeRefreshHome?.isRefreshing = false
                 val alertDialog = AlertDialog.Builder(requireActivity())
                 alertDialog.setTitle("SMS")
                 alertDialog.setMessage("SMS xizmatiga ruxsat berildi")
@@ -93,7 +98,9 @@ class HomeFragment : Fragment() {
                 }
                 alertDialog.show()
             } else {
-                //getData()
+                shouldStopSending = false
+                (activity as? Sample)?.resetPolling()
+                getData()
             }
         }
         homeList?.setOnScrollListener(object : AbsListView.OnScrollListener {
@@ -137,6 +144,9 @@ class HomeFragment : Fragment() {
                 ).show()
                 txtHomipAdress!!.text = Sample.getIpAddress()
                 txtHomipLimt!!.text = Sample.getSmsLimit() + " ta Sms"
+                shouldStopSending = false
+                (activity as? Sample)?.resetPolling()
+                getData()
             }
         }
         btnHomSendSms!!.setOnClickListener {
@@ -148,6 +158,13 @@ class HomeFragment : Fragment() {
                 status_list,
                 requireContext()
             )
+        }
+        btnHomStop?.setOnClickListener {
+            shouldStopSending = true
+            handler.removeCallbacksAndMessages(null)
+            (activity as? Sample)?.stopAllPolling()
+            btnHomStop?.visibility = View.GONE
+            Toast.makeText(requireContext(), "SMS jo'natish to'xtatildi", Toast.LENGTH_SHORT).show()
         }
 
         Sample.addSMSCountListener { count ->
@@ -162,18 +179,21 @@ class HomeFragment : Fragment() {
     private fun getData() {
         var ipAddress = ""
         val data = sharedPreferences?.getString("ipAddress", "").toString()
-        if (data == "") {
+        if (data.isEmpty() || data == "[]") {
             return
         }
-        for (i in data.split(",").indices) {
-            if (data.split(",")[i].contains("@1")) {
-                ipAddress = data.split(",")[i].split("@1")[0]
-                break
-            } else {
-                ipAddress = data.split(",")[0].replace("@0", "")
+        try {
+            val list = Gson().fromJson(data, Array<String>::class.java)
+            for (item in list) {
+                if (item.contains("@1")) {
+                    ipAddress = item.substringBefore("@1")
+                    break
+                } else if (ipAddress.isEmpty()) {
+                    ipAddress = item.replace("@0", "")
+                }
             }
-        }
-        txtHomipAdress!!.text = ipAddress.replace("[", "").replace("]", "").replace("\"", "")
+        } catch (_: Exception) {}
+        txtHomipAdress!!.text = ipAddress
         txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "0")} ta sms"
         smsLimit = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
         if (smsLimit <= 50) {
@@ -200,9 +220,15 @@ class HomeFragment : Fragment() {
                 status_list = ArrayList()
                 if (json.data.content.isEmpty()) {
                     Toast.makeText(context, "Ma'lumot topilmadi", Toast.LENGTH_LONG).show()
-                    handler.postDelayed({
-                        getNewData()
-                    }, 7000)
+                    swipeRefreshHome?.isRefreshing = false
+                    if (!shouldStopSending) {
+                        btnHomStop?.visibility = View.VISIBLE
+                        handler.postDelayed({
+                            getNewData()
+                        }, (activity as? Sample)?.getPollDelay() ?: 10000L)
+                    } else {
+                        btnHomStop?.visibility = View.GONE
+                    }
                 } else {
                     for (i in json.data.content.indices) {
                         id_list?.add(json.data.content[i].id)
@@ -234,7 +260,7 @@ class HomeFragment : Fragment() {
                 }
             }, {
                 swipeRefreshHome?.isRefreshing = false
-
+                btnHomStop?.visibility = View.GONE
 
                 mediaPlayer = MediaPlayer.create(requireContext(), R.raw.errors)
                 mediaPlayer?.start()
@@ -251,6 +277,10 @@ class HomeFragment : Fragment() {
         messageTypeList: MutableList<String>?,
         statusList: MutableList<Int>?,
         requireContext: Context) {
+        if (shouldStopSending) return
+        shouldStopSending = false
+        (activity as? Sample)?.resetPolling()
+        btnHomStop?.visibility = View.VISIBLE
         if (messageList?.size != 0 && phoneList?.size != 0 && idList?.size != 0 && smsLimit > 0) {
             val id = idList?.get(0)
             val message = messageList?.get(0)
@@ -289,6 +319,7 @@ class HomeFragment : Fragment() {
                         requireContext)
                 }, Sample.DELAY_BETWEEN_SMS)
             } else {
+                btnHomStop?.visibility = View.GONE
                 Toast.makeText(requireContext(), "Sms tugadi", Toast.LENGTH_SHORT).show()
                 if (sharedPreferences?.getString("sounds", "0") == "0") {
                     Handler().postDelayed({
@@ -305,9 +336,13 @@ class HomeFragment : Fragment() {
                 getNewData()
             }
         } else {
-            handler.postDelayed({
-                getData()
-            }, 8000)
+            if (!shouldStopSending) {
+                handler.postDelayed({
+                    getData()
+                }, (activity as? Sample)?.getPollDelay() ?: 10000L)
+            } else {
+                btnHomStop?.visibility = View.GONE
+            }
         }
     }
 
@@ -320,6 +355,10 @@ class HomeFragment : Fragment() {
         statusList: MutableList<Int>?,
         requireContext: Context
     ) {
+        if (shouldStopSending) return
+        shouldStopSending = false
+        (activity as? Sample)?.resetPolling()
+        btnHomStop?.visibility = View.VISIBLE
         if (messageList?.size != 0 && phoneList?.size != 0 && idList?.size != 0 && smsLimit > 0) {
             val id = idList?.get(0)
             val message = messageList?.get(0)
@@ -362,6 +401,7 @@ class HomeFragment : Fragment() {
                     )
                 }, Sample.DELAY_BETWEEN_SMS)
             } else {
+                btnHomStop?.visibility = View.GONE
                 Toast.makeText(requireContext(), "Sms tugadi", Toast.LENGTH_SHORT).show()
                 if (sharedPreferences?.getString("sounds", "0") == "0") {
                     Handler().postDelayed({
@@ -378,9 +418,13 @@ class HomeFragment : Fragment() {
                 getNewData()
             }
         } else {
-            handler.postDelayed({
-                getData()
-            }, 8000)
+            if (!shouldStopSending) {
+                handler.postDelayed({
+                    getData()
+                }, (activity as? Sample)?.getPollDelay() ?: 10000L)
+            } else {
+                btnHomStop?.visibility = View.GONE
+            }
         }
     }
 
@@ -467,18 +511,21 @@ class HomeFragment : Fragment() {
     private fun getNewData() {
         var ipAddress = ""
         val data = sharedPreferences?.getString("ipAddress", "").toString()
-        if (data == "") {
+        if (data.isEmpty() || data == "[]") {
             return
         }
-        for (i in data.split(",").indices) {
-            if (data.split(",")[i].contains("@1")) {
-                ipAddress = data.split(",")[i].split("@1")[0]
-                break
-            } else {
-                ipAddress = data.split(",")[0].replace("@0", "")
+        try {
+            val list = Gson().fromJson(data, Array<String>::class.java)
+            for (item in list) {
+                if (item.contains("@1")) {
+                    ipAddress = item.substringBefore("@1")
+                    break
+                } else if (ipAddress.isEmpty()) {
+                    ipAddress = item.replace("@0", "")
+                }
             }
-        }
-        txtHomipAdress!!.text = ipAddress.replace("[", "").replace("]", "").replace("\"", "")
+        } catch (_: Exception) {}
+        txtHomipAdress!!.text = ipAddress
         txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "0")} ta sms"
         smsLimit = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
         if (smsLimit <= 50) {
@@ -495,9 +542,15 @@ class HomeFragment : Fragment() {
         }&status=1"
         val stringRequest = StringRequest(
             Request.Method.GET, url, {
-                getData()
+                if (!shouldStopSending) {
+                    getData()
+                } else {
+                    btnHomStop?.visibility = View.GONE
+                    swipeRefreshHome?.isRefreshing = false
+                }
             }, {
                 swipeRefreshHome?.isRefreshing = false
+                btnHomStop?.visibility = View.GONE
                 Toast.makeText(context, "That didn't work!", Toast.LENGTH_LONG).show()
             })
         queue.add(stringRequest)

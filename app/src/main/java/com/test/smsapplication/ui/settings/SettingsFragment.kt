@@ -28,6 +28,7 @@ class SettingsFragment : Fragment() {
     var btnSetAddPhone: ImageView? = null
     var txtSetIpAdress: TextView? = null
     var txtSetPhone: TextView? = null
+    var txtSetphoneId: TextView? = null
     var listSettings: ListView? = null
 
     private var imgSetSound: ImageView? = null
@@ -56,6 +57,7 @@ class SettingsFragment : Fragment() {
         btnSetAddPhone = view.findViewById(R.id.btnSetAddPhone)
         txtSetIpAdress = view.findViewById(R.id.txtSetIpAdress)
         txtSetPhone = view.findViewById(R.id.txtSetPhone)
+        txtSetphoneId = view.findViewById(R.id.txtSetphoneId)
         listSettings = view.findViewById(R.id.listSettings)
 
         imgSetSound = view.findViewById(R.id.imgSetSound)
@@ -63,6 +65,19 @@ class SettingsFragment : Fragment() {
 
         sharedPreferences = activity?.getSharedPreferences("teda.uz", 0)
         data = sharedPreferences?.getString("ipAddress", "").toString()
+
+        val guideHeader = view.findViewById<View>(R.id.guideHeader)
+        val guideContent = view.findViewById<View>(R.id.guideContent)
+        val guideArrow = view.findViewById<TextView>(R.id.guideArrow)
+        guideHeader?.setOnClickListener {
+            if (guideContent?.visibility == View.VISIBLE) {
+                guideContent.visibility = View.GONE
+                guideArrow?.text = "▼"
+            } else {
+                guideContent?.visibility = View.VISIBLE
+                guideArrow?.text = "▲"
+            }
+        }
 
         listSettings!!.adapter = null
         listSettings!!.divider = null
@@ -163,6 +178,7 @@ class SettingsFragment : Fragment() {
         txtSetPhone?.setOnClickListener {
             ediSetPhone?.visibility = View.VISIBLE
             btnSetAddPhone?.visibility = View.VISIBLE
+            txtSetphoneId?.visibility = View.VISIBLE
         }
         return view
     }
@@ -207,6 +223,7 @@ class SettingsFragment : Fragment() {
             txtSetPhone?.text = sharedPreferences?.getString("phone", "")
             ediSetPhone?.visibility = View.GONE
             btnSetAddPhone?.visibility = View.GONE
+            txtSetphoneId?.visibility = View.GONE
         }
         val data = sharedPreferences?.getString("ipAddress", "").toString()
         if (data == ""||data == "[]"){

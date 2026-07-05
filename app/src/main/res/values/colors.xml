@@ -14,4 +14,10 @@
     <color name="color4">#F4A261</color>
     <color name="color5">#E76F51</color>
     <color name="transparent">#00000000</color>
+    <color name="surface">#F5F7FA</color>
+    <color name="text_primary">#1A1A2E</color>
+    <color name="text_secondary">#6C757D</color>
+    <color name="card_border">#E8ECF0</color>
+    <color name="label_text">#8E9AAF</color>
+    <color name="divider">#E8ECF0</color>
 </resources>

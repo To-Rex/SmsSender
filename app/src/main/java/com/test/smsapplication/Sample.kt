@@ -33,9 +33,11 @@ class Sample : AppCompatActivity() {
     private lateinit var smsManager: SmsManager
 
     private val handler: Handler = Handler()
+    private var shouldStopSending = false
     private var mediaPlayer: MediaPlayer? = null
 
     private var adapter: DashAdapter? = null
+    private var isAppInForeground = true
     private var idList: MutableList<Int>? = null
     private var phoneList: MutableList<String>? = null
     private var messageList: MutableList<String>? = null
@@ -107,6 +109,22 @@ class Sample : AppCompatActivity() {
         }
         getData()
     }
+    override fun onResume() {
+        super.onResume()
+        isAppInForeground = true
+    }
+    override fun onPause() {
+        super.onPause()
+        isAppInForeground = false
+    }
+    fun getPollDelay(): Long = if (isAppInForeground) 10000L else 30000L
+    fun stopAllPolling() {
+        shouldStopSending = true
+        handler.removeCallbacksAndMessages(null)
+    }
+    fun resetPolling() {
+        shouldStopSending = false
+    }
     @SuppressLint("SetTextI18n")
     private fun getNewData() {
         smsCount = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
@@ -155,9 +173,11 @@ class Sample : AppCompatActivity() {
                 statusList = ArrayList()
                 if (json.data.content.isEmpty()) {
                     Toast.makeText(this, "Ma'lumot topilmadi", Toast.LENGTH_LONG).show()
-                    handler.postDelayed({
-                        getNewData()
-                    }, 7000)
+                    if (!shouldStopSending) {
+                        handler.postDelayed({
+                            getNewData()
+                        }, getPollDelay())
+                    }
                 } else {
                     for (i in json.data.content.indices) {
                         idList?.add(json.data.content[i].id)
@@ -251,9 +271,11 @@ class Sample : AppCompatActivity() {
                 getNewData()
             }
         } else {
-            handler.postDelayed({
-                getData()
-            }, 8000)
+            if (!shouldStopSending) {
+                handler.postDelayed({
+                    getData()
+                }, getPollDelay())
+            }
         }
     }
 
@@ -322,9 +344,11 @@ class Sample : AppCompatActivity() {
                 getNewData()
             }
         } else {
-            handler.postDelayed({
-                getData()
-            }, 8000)
+            if (!shouldStopSending) {
+                handler.postDelayed({
+                    getData()
+                }, getPollDelay())
+            }
         }
     }
 
@@ -409,17 +433,23 @@ class Sample : AppCompatActivity() {
         mutableList.removeAt(position)
     }
     private fun getIPAdress():String{
-        var ipAddress = ""
         val data = sharedPreferences?.getString("ipAddress", "").toString()
-        for (i in data.split(",").indices) {
-            if (data.split(",")[i].contains("@1")) {
-                ipAddress = data.split(",")[i].split("@1")[0]
-                break
-            } else {
-                ipAddress = data.split(",")[0].replace("@0", "")
+        if (data.isEmpty() || data == "[]") return ""
+        return try {
+            val list = Gson().fromJson(data, Array<String>::class.java)
+            var result = ""
+            for (item in list) {
+                if (item.contains("@1")) {
+                    result = item.substringBefore("@1")
+                    break
+                } else if (result.isEmpty()) {
+                    result = item.replace("@0", "")
+                }
             }
+            result
+        } catch (e: Exception) {
+            ""
         }
-        return ipAddress.replace("[", "").replace("]", "").replace("\"", "")
     }
     private fun getSmsLimit(): Int {
         return sharedPreferences?.getString("smsLimit", "0")!!.toInt()

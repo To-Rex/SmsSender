@@ -1,99 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefreshHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints">
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.04"/>
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.96"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/surface"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/txtHomipAdress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/ip_address"
-            android:textSize="19sp"
-            app:layout_constraintEnd_toStartOf="@+id/txtHomipLimt"
-            app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/txtHomipLimt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="19sp"
-            android:text="@string/sms_limt"
-            app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btnHomNewSms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/buttons_back"
-            android:text="@string/yangi_smslar"
-            android:inputType="text"
-            android:textColor="@color/white"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline4"
-            tools:ignore="TextViewEdits" />
-
-        <Button
-            android:id="@+id/btnHomSendSms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/buttons_back"
-            android:text="@string/smslarni_jo_natish"
-            android:inputType="text"
-            android:textColor="@color/white"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:layout_marginBottom="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            tools:ignore="TextViewEdits" />
-
+        <!-- Header Card -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_gradient"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Server"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:id="@+id/txtHomipAdress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/ip_address"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:alpha="0.2"
+                android:background="@color/white" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SMS Limiti"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:id="@+id/txtHomipLimt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/sms_limt"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- List Container -->
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/edit_text_back"
-            app:layout_constraintBottom_toTopOf="@+id/btnHomNewSms"
-            app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/guideline4"
-            app:layout_constraintTop_toBottomOf="@+id/txtHomipAdress">
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_card_white"
+            android:elevation="2dp"
+            android:padding="8dp">
 
             <ListView
                 android:id="@+id/homeList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp" />
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:padding="4dp"
+                android:scrollbars="none" />
+        </FrameLayout>
 
+        <!-- Bottom Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnHomStop"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_button_red"
+                android:elevation="3dp"
+                android:gravity="center"
+                android:text="SMS jo'natishni to'xtatish"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:ignore="TextViewEdits" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnHomNewSms"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_outline"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:text="@string/yangi_smslar"
+                    android:textAllCaps="false"
+                    android:textColor="@color/color2"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:ignore="TextViewEdits" />
+
+                <Button
+                    android:id="@+id/btnHomSendSms"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_teal"
+                    android:elevation="3dp"
+                    android:gravity="center"
+                    android:text="@string/smslarni_jo_natish"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:ignore="TextViewEdits" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
