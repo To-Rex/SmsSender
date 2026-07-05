@@ -174,8 +174,8 @@ class HomeFragment : Fragment() {
             }
         }
         txtHomipAdress!!.text = ipAddress.replace("[", "").replace("]", "").replace("\"", "")
-        txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "")} ta sms"
-        smsLimit = sharedPreferences?.getString("smsLimit", "")!!.toInt()
+        txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "0")} ta sms"
+        smsLimit = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
         if (smsLimit <= 50) {
             txtHomipLimt!!.setTextColor(Color.RED)
         }
@@ -185,6 +185,7 @@ class HomeFragment : Fragment() {
         val phone = sharedPreferences?.getString("phone", "")
         //val url = "http://185.185.80.245:77/api/sms/status?page=0&size=50&employeePhone=998977515747&status=2"
         val url = "${txtHomipAdress?.text}api/sms/status?page=0&size=100&employeePhone=${
+
             phone?.substring(1)
         }&status=2"
         val stringRequest = StringRequest(
@@ -478,8 +479,8 @@ class HomeFragment : Fragment() {
             }
         }
         txtHomipAdress!!.text = ipAddress.replace("[", "").replace("]", "").replace("\"", "")
-        txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "")} ta sms"
-        smsLimit = sharedPreferences?.getString("smsLimit", "")!!.toInt()
+        txtHomipLimt!!.text = "${sharedPreferences?.getString("smsLimit", "0")} ta sms"
+        smsLimit = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
         if (smsLimit <= 50) {
             txtHomipLimt!!.setTextColor(Color.RED)
         }

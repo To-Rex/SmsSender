@@ -109,10 +109,13 @@ class Sample : AppCompatActivity() {
     }
     @SuppressLint("SetTextI18n")
     private fun getNewData() {
-        smsCount = sharedPreferences?.getString("smsLimit", "")!!.toInt()
+        smsCount = sharedPreferences?.getString("smsLimit", "0")!!.toInt()
         if (smsCount <= 50) {
             Toast.makeText(this, "Sms limit tugadi", Toast.LENGTH_LONG).show()
         }
+
+        ipLink = getIPAdress()
+        if (ipLink.isNullOrEmpty()) return
 
         val queue = Volley.newRequestQueue(this)
 
@@ -131,11 +134,12 @@ class Sample : AppCompatActivity() {
         if (smsCount <= 50) {
             Toast.makeText(this, "Sms limit tugadi", Toast.LENGTH_LONG).show()
         }
+        ipLink = getIPAdress()
+        if (ipLink.isNullOrEmpty()) return
         val queue = Volley.newRequestQueue(this)
 
         val phone = sharedPreferences?.getString("phone", "")
         //val url = "http://185.185.80.245:77/api/sms/status?page=0&size=50&employeePhone=998977515747&status=2"
-        ipLink = getIPAdress()
         val url = "${ipLink}api/sms/status?page=0&size=100&employeePhone=${
             phone?.substring(1)
         }&status=2"
@@ -418,6 +422,6 @@ class Sample : AppCompatActivity() {
         return ipAddress.replace("[", "").replace("]", "").replace("\"", "")
     }
     private fun getSmsLimit(): Int {
-        return sharedPreferences?.getString("smsLimit", "")!!.toInt()
+        return sharedPreferences?.getString("smsLimit", "0")!!.toInt()
     }
 }
